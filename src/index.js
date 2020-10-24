@@ -1,49 +1,46 @@
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
-class App extends Component {
-  constructor(props) {
-    super(props);
+import Recipe from "./Recipe";
 
-    this.state = {
-      list: list
-    };
-  }
+const App = () => {
+  const APP_ID = "8393d0b6";
+  const APP_KEY = "d7ddd6950eafd281298c6578c5c85ef6";
 
-  render() {
-    const list = [
-      {
-        title: "React",
-        url: "https://facebook.github.io/react/",
-        author: "Jordan Walke",
-        num_comments: 3,
-        points: 4,
-        objectID: 0
-      },
-      {
-        title: "Redux",
-        url: "https://github.com/reactjs/redux",
-        author: "Dan Abramov, Andrew Clark",
-        num_comments: 2,
-        points: 5,
-        objectID: 1
-      }
-    ];
+  const [recipes, setRecipes] = useState([]);
+  const [search, setSearch] = useState("");
 
-    return (
-      <div className="App">
-        {this.state.list.map((item) => (
-          <div key={item.objectID}>
-            <span>
-              <a href={item.url}>{item.title}</a>
-            </span>
-            <span>{item.author}</span>
-            <span>{item.num_comments}</span>
-            <span>{item.points}</span>
-          </div>
-        ))}
-      </div>
+  useEffect(() => {
+    getRecipes();
+  }, []);
+
+  const getRecipes = async () => {
+    const response = await fetch(
+      `https://api.edamam.com/search?q=chicken&app_id=${APP_ID}&app_key=${APP_KEY}`
     );
-  }
-}
+    const data = await response.json();
+    setRecipes(data.hits);
+    console.log(data.hits);
+  };
+
+  return (
+    <div className="App">
+      <form className="search-form">
+        <input className="search-bar" type="text"></input>
+        <button className="search-button" type="submit">
+          Search
+        </button>
+      </form>
+      {recipes.map((recipe) => (
+        <Recipe
+          key={recipe.recipe.label}
+          title={recipe.recipe.label}
+          calories={recipe.recipe.calories}
+          image={recipe.recipe.image}
+        />
+      ))}
+      ;
+    </div>
+  );
+};
 
 ReactDOM.render(<App />, document.getElementById("root"));
